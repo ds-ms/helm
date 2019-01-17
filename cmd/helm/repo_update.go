@@ -38,12 +38,14 @@ future releases.
 `
 
 var errNoRepositories = errors.New("no repositories found. You must add one before updating")
+var errNoRepositoriesMatchingRepoName = errors.New("no repositories found matching the provided name, verify if the repo exists with that name.")
 
 type repoUpdateCmd struct {
 	update func([]*repo.ChartRepository, io.Writer, helmpath.Home, bool) error
 	home   helmpath.Home
 	out    io.Writer
 	strict bool
+	name string
 }
 
 func newRepoUpdateCmd(out io.Writer) *cobra.Command {
@@ -64,6 +66,7 @@ func newRepoUpdateCmd(out io.Writer) *cobra.Command {
 
 	f := cmd.Flags()
 	f.BoolVar(&u.strict, "strict", false, "fail on update warnings")
+	f.StringVar(&u.name, "name", "", "repo to update")
 
 	return cmd
 }
@@ -83,8 +86,24 @@ func (u *repoUpdateCmd) run() error {
 		if err != nil {
 			return err
 		}
-		repos = append(repos, r)
+		if u.name != nil {
+			if cfg.Name.HasSuffix(u.name) {
+				repos = append(repos, r)
+				break;
+			}
+			else {
+				continue;
+			}
+		}
+		else {
+			repos = append(repos, r)
+		}
 	}
+	
+	if len(repos) == 0 {
+		return errNoRepositoriesMatchingRepoName
+	}
+
 	return u.update(repos, u.out, u.home, u.strict)
 }
 
