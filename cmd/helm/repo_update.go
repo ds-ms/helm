@@ -86,16 +86,14 @@ func (u *repoUpdateCmd) run() error {
 		if err != nil {
 			return err
 		}
-		if u.name != nil {
-			if cfg.Name.HasSuffix(u.name) {
+		if len(u.name) != 0 {
+			if cfg.Name == u.name {
 				repos = append(repos, r)
 				break;
-			}
-			else {
+			} else {
 				continue;
 			}
-		}
-		else {
+		} else {
 			repos = append(repos, r)
 		}
 	}
