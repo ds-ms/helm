@@ -55,7 +55,7 @@ func newRepoUpdateCmd(out io.Writer) *cobra.Command {
 		update: updateCharts,
 	}
 	cmd := &cobra.Command{
-		Use:     "update",
+		Use:     "update [repo_name]",
 		Aliases: []string{"up"},
 		Short:   "update information of available charts locally from chart repositories",
 		Long:    updateDesc,
